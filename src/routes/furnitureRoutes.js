@@ -4,6 +4,7 @@ import {
   estimateCost,
   saveConfiguration,
   getSavedConfigurations,
+  getOrderPayload,
 } from '../controllers/furnitureController.js';
 
 const router = Router();
@@ -19,5 +20,8 @@ router.post('/configurations', saveConfiguration);
 
 // Endpoint mengambil riwayat konfigurasi tersimpan
 router.get('/configurations', getSavedConfigurations);
+
+// Endpoint handoff kontrak inter-service ke platform utama ("Tukang Online")
+router.get('/configurations/:id/order-payload', getOrderPayload);
 
 export default router;

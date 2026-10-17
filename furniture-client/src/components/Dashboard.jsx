@@ -8,7 +8,8 @@ export default function Dashboard({ onSelectConfig, onBack }) {
   useEffect(() => {
     const fetchConfigs = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/furniture/configurations');
+        const apiBase = '/api/furniture';
+        const res = await fetch(`${apiBase}/configurations`);
         const json = await res.json();
         if (json.status === 'success') {
           setConfigs(json.data);

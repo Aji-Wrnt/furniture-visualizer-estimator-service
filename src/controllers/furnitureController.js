@@ -217,3 +217,74 @@ export const getSavedConfigurations = async (req, res) => {
     });
   }
 };
+
+// 5. Kontrak Inter-Service API: Payload standar pesanan untuk platform utama ("Tukang Online")
+export const getOrderPayload = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const query = `
+      SELECT 
+        c.*, 
+        f.name as furniture_name,
+        bm.material_name as base_material_name,
+        fm.material_name as finishing_material_name
+      FROM custom_configurations c
+      LEFT JOIN catalog_furniture f ON c.furniture_id = f.id
+      LEFT JOIN materials bm ON c.base_material_id = bm.id
+      LEFT JOIN materials fm ON c.finishing_material_id = fm.id
+      WHERE c.id = $1
+    `;
+
+    const result = await pool.query(query, [id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        status: 'fail',
+        message: 'Konfigurasi mebel tidak ditemukan',
+      });
+    }
+
+    const row = result.rows[0];
+    const specs = typeof row.parametric_specs === 'string'
+      ? JSON.parse(row.parametric_specs)
+      : (row.parametric_specs || {});
+
+    const orderPayload = {
+      itemType: 'CUSTOM_FURNITURE',
+      configurationId: row.id,
+      productName: row.furniture_name || 'Custom Furniture',
+      realDimensions: {
+        widthCm: Number(row.real_width_cm),
+        heightCm: Number(row.real_height_cm),
+        depthCm: Number(row.real_depth_cm),
+      },
+      specsSummary: {
+        wood: row.base_material_name || '-',
+        finishing: row.finishing_material_name || '-',
+        shelves: Number(specs.shelvesCount) || 0,
+        door: specs.hasDoor ? (specs.doorType || 'DOUBLE') : 'NONE',
+        finishColorHex: specs.finishColorHex || '#8B5A2B',
+        requiresTukangInstallation: Boolean(specs.withInstallationService),
+      },
+      referenceSnapshotUrl: row.ar_snapshot_url,
+      priceBreakdown: {
+        materialsCost: Number(row.estimated_material_cost),
+        laborCost: Number(row.estimated_labor_cost),
+        totalOrderPrice: Number(row.estimated_total_price),
+      },
+      createdAt: row.created_at,
+    };
+
+    return res.status(200).json({
+      status: 'success',
+      data: orderPayload,
+    });
+  } catch (error) {
+    console.error('Error saat membuat order-payload:', error);
+    return res.status(500).json({
+      status: 'error',
+      message: 'Gagal mengambil data order payload',
+      error: error.message,
+    });
+  }
+};

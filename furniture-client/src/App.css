@@ -5,10 +5,16 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
-body {
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
   background-color: #0f172a;
   color: #f8fafc;
   overflow-x: hidden;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* App Shell Layout */
@@ -18,6 +24,7 @@ body {
   min-height: 100vh;
   width: 100%;
   background-color: #0f172a;
+  overflow-y: visible;
 }
 
 /* Top App Header */
@@ -60,9 +67,10 @@ body {
 
 /* Main Content Container */
 .app-body {
-  flex: 1;
+  flex: 1 1 auto;
   width: 100%;
-  padding-bottom: 72px; /* Ruang untuk Bottom Nav Bar */
+  padding-bottom: 90px;
+  overflow-y: visible;
 }
 
 .center-loader {
@@ -317,20 +325,93 @@ hr {
   cursor: not-allowed;
 }
 
-/* Responsif Mobile (ROG Phone 9 FE / Smartphone) */
-@media (max-width: 768px) {
+/* Tombol Toggle Kamera AR Passthrough */
+.btn-ar-toggle {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+  padding: 8px 16px;
+  background: rgba(15, 23, 42, 0.85);
+  color: #ffffff;
+  border: 1px solid #475569;
+  border-radius: 24px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-ar-toggle:hover {
+  background-color: #334155;
+}
+
+/* Menu Navigasi Khusus Desktop / Laptop */
+.desktop-nav-links {
+  display: none;
+  gap: 8px;
+  align-items: center;
+}
+
+.desktop-nav-links .nav-btn {
+  background: none;
+  border: 1px solid transparent;
+  color: #94a3b8;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.desktop-nav-links .nav-btn:hover {
+  color: #f1f5f9;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.desktop-nav-links .nav-btn.active {
+  color: #38bdf8;
+  background-color: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+/* Responsif Mobile (ROG Phone 9 FE / Smartphone / Layar < 1024px) */
+@media (max-width: 1023px) {
+  .mobile-shell {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-y: visible;
+  }
+
+  .app-body {
+    padding-bottom: 90px; /* Ruang ekstra agar konten paling bawah tidak tertutup Bottom Nav */
+    overflow-y: visible;
+  }
+
   .studio-view {
+    display: flex;
     flex-direction: column;
     height: auto;
-    min-height: calc(100vh - 60px - 64px);
+    min-height: auto;
+    width: 100%;
     position: relative;
-    overflow-y: auto;
+    overflow: visible;
   }
 
   .viewer-wrapper {
     position: relative;
-    height: 380px;
+    height: 48vh; /* Ambil separuh layar saja di HP */
+    min-height: 320px;
     width: 100%;
+    flex-shrink: 0; /* Cegah kanvas tergencet saat scroll */
   }
 
   .control-panel {
@@ -339,15 +420,273 @@ hr {
     right: auto;
     width: 100%;
     max-height: none;
+    overflow-y: visible; /* Biarkan mengalir mengikuti tinggi konten */
     border-radius: 0;
     border-left: none;
     border-right: none;
     border-bottom: none;
     padding: 20px 16px;
+    touch-action: pan-y !important; /* Izinkan scroll vertikal normal dengan jari */
   }
 
   .btn-back-float {
     top: 12px;
     left: 12px;
   }
+}
+
+/* ========================================================
+   BREAKPOINT LAPTOP & DESKTOP (Layar Lebar >= 1024px)
+   ======================================================== */
+@media (min-width: 1024px) {
+  .desktop-nav-links {
+    display: flex;
+  }
+
+  .bottom-nav {
+    display: none; /* Di layar laptop, navigasi jempol disembunyikan */
+  }
+
+  .app-body {
+    padding-bottom: 0;
+  }
+
+  .studio-view {
+    flex-direction: row;
+    height: calc(100vh - 61px);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .viewer-wrapper {
+    position: relative;
+    width: 65%;
+    height: 100%;
+  }
+
+  .control-panel {
+    position: relative;
+    top: auto;
+    right: auto;
+    width: 35%;
+    height: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+    border-radius: 0;
+    border-top: none;
+    border-right: none;
+    border-bottom: none;
+    border-left: 1px solid #334155;
+    background: rgba(15, 23, 42, 0.96);
+    padding: 24px 20px;
+  }
+}
+
+/* ========================================================
+   VIRTUAL ANALOG CONTROLS (SPLIT-THUMB GLASSMORPHISM)
+   ======================================================== */
+.ar-control-overlay {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: space-between; /* Pisahkan ke pojok kiri dan kanan layar */
+  align-items: flex-end;
+  pointer-events: none;
+  z-index: 10;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Container Kiri & Kanan dibuat semi-transparan dengan blur modern */
+.dpad-container,
+.rotation-controls {
+  pointer-events: auto;
+  user-select: none;
+  background: rgba(15, 23, 42, 0.42); /* Transparan tinggi agar objek/lantai tetap terlihat */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 6px;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.dpad-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.dpad-row {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+/* Ukuran Tombol 36px ringkas tetapi Hitbox diperluas 6px via ::after */
+.dpad-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(30, 41, 59, 0.55);
+  color: #f1f5f9;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  font-size: 0.95rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  touch-action: none;
+  position: relative;
+  transition: background 0.15s, transform 0.1s, border-color 0.15s;
+}
+
+/* Trik Hitbox: Menambah area sentuh 6px di sekeliling tombol (efektif 48x48px) agar tidak meleset */
+.dpad-btn::after {
+  content: '';
+  position: absolute;
+  top: -6px;
+  bottom: -6px;
+  left: -6px;
+  right: -6px;
+}
+
+.dpad-btn:active {
+  background: #38bdf8;
+  color: #0f172a;
+  border-color: #38bdf8;
+  transform: scale(0.92);
+}
+
+.dpad-btn.center-reset {
+  background: rgba(51, 65, 85, 0.6);
+  color: #38bdf8;
+  font-size: 0.85rem;
+}
+
+.dpad-btn.center-reset:active {
+  background: #38bdf8;
+  color: #0f172a;
+}
+
+/* Panel Rotasi Kanan Dibuat Vertikal agar Hemat Ruang & Ergonomis Jempol Kanan */
+.rotation-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rot-btn {
+  height: 36px;
+  padding: 0 10px;
+  background: rgba(30, 41, 59, 0.55);
+  color: #f1f5f9;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  touch-action: none;
+  position: relative;
+  transition: all 0.15s ease;
+}
+
+.rot-btn::after {
+  content: '';
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  left: -5px;
+  right: -5px;
+}
+
+.rot-btn:active {
+  background: #38bdf8;
+  color: #0f172a;
+  border-color: #38bdf8;
+  transform: scale(0.94);
+}
+
+/* Tombol Toggle Sembunyikan/Tampilkan Kontrol Analog */
+.btn-controls-toggle {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 10;
+  padding: 6px 12px;
+  background: rgba(15, 23, 42, 0.65);
+  color: #f1f5f9;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-controls-toggle:hover {
+  background: rgba(30, 41, 59, 0.85);
+  border-color: #38bdf8;
+}
+
+.elevation-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #38bdf8;
+  text-align: center;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 6px;
+  padding: 2px 6px;
+  white-space: nowrap;
+}
+
+.elevation-row,
+.rot-row {
+  display: flex;
+  gap: 4px;
+}
+
+.elev-btn {
+  font-size: 0.72rem;
+  flex: 1;
+}
+
+.left-controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.elevation-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: rgba(15, 23, 42, 0.42);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 6px;
+  border-radius: 14px;
+}
+
+.elevation-buttons .elev-btn {
+  font-size: 11px;
+  font-weight: 700;
+  width: 36px;
+  height: 36px;
 }

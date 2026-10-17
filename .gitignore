@@ -8,6 +8,12 @@ node_modules/
 !.env.example
 *.local
 
+# SSL Certificates & Private Keys
+*.pem
+*.key
+*.crt
+*.cert
+
 # Production build outputs (Client / Vite)
 dist/
 dist-ssr/
@@ -26,6 +32,7 @@ lerna-debug.log*
 uploads/
 temp/
 tmp/
+coverage/
 
 # Editor & IDE files
 .vscode/

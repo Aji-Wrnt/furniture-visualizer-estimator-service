@@ -4,7 +4,7 @@ import FurnitureViewer from './components/FurnitureViewer.jsx';
 import Dashboard from './components/Dashboard.jsx';
 import './App.css';
 
-const API_BASE_URL = 'http://localhost:5000/api/furniture';
+const API_BASE_URL = '/api/furniture';
 
 export default function App() {
   const viewerRef = useRef(null);
@@ -236,6 +236,31 @@ export default function App() {
           <span className="brand-badge">BENGKEL MEBEL</span>
           <h1>Tukang Online Mebel</h1>
         </div>
+
+        {/* Menu Navigasi Khusus Desktop / Laptop */}
+        <nav className="desktop-nav-links">
+          <button
+            type="button"
+            className={`nav-btn ${currentView === 'storefront' ? 'active' : ''}`}
+            onClick={() => setCurrentView('storefront')}
+          >
+            🪑 Etalase
+          </button>
+          <button
+            type="button"
+            className={`nav-btn ${currentView === 'studio' ? 'active' : ''}`}
+            onClick={() => setCurrentView('studio')}
+          >
+            📐 Studio 3D
+          </button>
+          <button
+            type="button"
+            className={`nav-btn ${currentView === 'orders' ? 'active' : ''}`}
+            onClick={() => setCurrentView('orders')}
+          >
+            📋 Pesanan Saya
+          </button>
+        </nav>
       </header>
 
       {/* Main Body Content */}
