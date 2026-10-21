@@ -23,37 +23,73 @@ const FurnitureViewer = forwardRef(function FurnitureViewer(
   const [showControls, setShowControls] = useState(true);
   const [elevationCm, setElevationCm] = useState(0);
 
-  // Expose fungsi captureSnapshot ke parent (mendukung komposit foto ruangan + mebel 3D)
-  useImperativeHandle(ref, () => ({
-    captureSnapshot: () => {
-      if (!rendererRef.current || !sceneRef.current || !cameraRef.current) return null;
+  // Fungsi internal komposit foto ruangan asli + render 3D
+  const getCompositeSnapshotDataUrl = () => {
+    if (!rendererRef.current || !sceneRef.current || !cameraRef.current) return null;
 
-      // 1. Render frame terbaru
-      rendererRef.current.render(sceneRef.current, cameraRef.current);
-      const canvas3D = rendererRef.current.domElement;
-      const video = videoRef.current;
+    // 1. Render frame terbaru Three.js
+    rendererRef.current.render(sceneRef.current, cameraRef.current);
+    const canvas3D = rendererRef.current.domElement;
+    const video = videoRef.current;
 
-      // 2. Buat canvas pembantu seukuran viewport render 3D
-      const offscreenCanvas = document.createElement('canvas');
-      offscreenCanvas.width = canvas3D.width;
-      offscreenCanvas.height = canvas3D.height;
-      const ctx = offscreenCanvas.getContext('2d');
+    // 2. Buat canvas pembantu seukuran resolusi kanvas Three.js
+    const offscreenCanvas = document.createElement('canvas');
+    offscreenCanvas.width = canvas3D.width;
+    offscreenCanvas.height = canvas3D.height;
+    const ctx = offscreenCanvas.getContext('2d');
 
-      // 3. Jika mode AR aktif dan feed video siap, gambar video ruangan asli
-      if (arMode && video && video.readyState >= 2) {
-        ctx.drawImage(video, 0, 0, offscreenCanvas.width, offscreenCanvas.height);
+    // 3. Layer 1: Frame Kamera Ruangan (jika mode AR aktif dan feed video siap)
+    const isVideoReady = arMode && video && (video.readyState >= 2 || video.currentTime > 0) && video.videoWidth > 0;
+    if (isVideoReady) {
+      // Terapkan aspek rasio object-fit: cover agar frame kamera pas persis seperti di layar
+      const canvasAspect = offscreenCanvas.width / offscreenCanvas.height;
+      const videoAspect = video.videoWidth / video.videoHeight;
+      let sx = 0, sy = 0, sWidth = video.videoWidth, sHeight = video.videoHeight;
+
+      if (videoAspect > canvasAspect) {
+        // Video lebih lebar dari kanvas -> potong sisi kiri dan kanan
+        sWidth = video.videoHeight * canvasAspect;
+        sx = (video.videoWidth - sWidth) / 2;
       } else {
-        // Background studio standar jika kamera mati (gelap elegan)
-        ctx.fillStyle = '#1f242d';
-        ctx.fillRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+        // Video lebih tinggi dari kanvas -> potong atas dan bawah
+        sHeight = video.videoWidth / canvasAspect;
+        sy = (video.videoHeight - sHeight) / 2;
       }
 
-      // 4. Tumpuk render objek mebel 3D Three.js di atasnya
-      ctx.drawImage(canvas3D, 0, 0);
+      ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, offscreenCanvas.width, offscreenCanvas.height);
+    } else {
+      // Background studio gelap elegan jika kamera mati
+      ctx.fillStyle = '#1f242d';
+      ctx.fillRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+    }
 
-      // 5. Ekspor ke Base64 PNG
-      return offscreenCanvas.toDataURL('image/png');
-    },
+    // 4. Layer 2: Objek 3D Lemari
+    ctx.drawImage(canvas3D, 0, 0);
+
+    // 5. Ekspor ke Base64 PNG
+    return offscreenCanvas.toDataURL('image/png');
+  };
+
+  // Fungsi unduh gambar langsung ke memori / galeri perangkat
+  const handleDownloadSnapshot = (prefix = 'mebel-custom') => {
+    const dataUrl = getCompositeSnapshotDataUrl();
+    if (!dataUrl) {
+      alert('Gagal mengambil gambar snapshot 3D.');
+      return;
+    }
+
+    const downloadLink = document.createElement('a');
+    downloadLink.href = dataUrl;
+    downloadLink.download = `${prefix}-${Date.now()}.png`;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  };
+
+  // Expose fungsi snapshot dan download ke parent
+  useImperativeHandle(ref, () => ({
+    captureSnapshot: getCompositeSnapshotDataUrl,
+    downloadSnapshot: handleDownloadSnapshot,
   }));
 
   // Kontrol Transformasi Manual Penuh (Sumbu X, Y, Z & Rotasi)
@@ -533,7 +569,7 @@ const FurnitureViewer = forwardRef(function FurnitureViewer(
         <span>{arMode ? '⏹️ Matikan Kamera (Mode 3D)' : '📷 Aktifkan Kamera Ruangan (AR)'}</span>
       </button>
 
-      {/* Kontrol Analog Virtual (D-Pad & Rotasi On-Screen) saat Mode AR Aktif */}
+      {/* Tombol Toggle Kontrol saat Mode AR Aktif */}
       {arMode && (
         <button
           type="button"
@@ -542,6 +578,18 @@ const FurnitureViewer = forwardRef(function FurnitureViewer(
           title="Sembunyikan atau Tampilkan Kontrol Analog"
         >
           {showControls ? '🎮 Sembunyikan Kontrol' : '🎮 Tampilkan Kontrol'}
+        </button>
+      )}
+
+      {/* Tombol Shutter Ambil Foto saat Mode AR aktif */}
+      {arMode && (
+        <button
+          type="button"
+          onClick={() => handleDownloadSnapshot('snapshot-ar')}
+          className="btn-ar-shutter"
+          title="Ambil Foto Ruangan + 3D dan Unduh ke Galeri HP"
+        >
+          <span>📸 Ambil Foto</span>
         </button>
       )}
 

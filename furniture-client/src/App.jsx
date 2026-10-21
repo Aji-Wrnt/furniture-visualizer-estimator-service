@@ -36,6 +36,7 @@ export default function App() {
   const [costBreakdown, setCostBreakdown] = useState(null);
   const [materialsBreakdown, setMaterialsBreakdown] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
 
   // 1. Ambil data katalog dan material saat awal buka aplikasi
@@ -177,9 +178,30 @@ export default function App() {
     withInstallation,
   ]);
 
+  // Unduh snapshot komposit langsung ke memori / galeri perangkat
+  const handleDownloadToGallery = () => {
+    const prodSlug = (selectedProduct?.name || 'mebel-custom').replace(/\s+/g, '-').toLowerCase();
+    if (viewerRef.current?.downloadSnapshot) {
+      viewerRef.current.downloadSnapshot(`mebel-custom-${prodSlug}`);
+    } else if (viewerRef.current?.captureSnapshot) {
+      const dataUrl = viewerRef.current.captureSnapshot();
+      if (!dataUrl) {
+        alert('Gagal mengambil gambar snapshot 3D.');
+        return;
+      }
+      const downloadLink = document.createElement('a');
+      downloadLink.href = dataUrl;
+      downloadLink.download = `mebel-custom-${prodSlug}-${Date.now()}.png`;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    }
+  };
+
   // 6. Simpan konfigurasi ke database PostgreSQL
   const handleSaveConfiguration = async () => {
     if (!costBreakdown) return;
+    setIsSaving(true);
 
     const snapshotDataUrl = viewerRef.current ? viewerRef.current.captureSnapshot() : null;
 
@@ -225,6 +247,8 @@ export default function App() {
       }
     } catch (err) {
       alert('Gagal menyimpan konfigurasi: ' + err.message);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -490,14 +514,25 @@ export default function App() {
                     )}
                   </div>
 
-                  <button
-                    type="button"
-                    className="btn-submit"
-                    onClick={handleSaveConfiguration}
-                    disabled={isLoading || !costBreakdown}
-                  >
-                    Simpan Konfigurasi Custom
-                  </button>
+                  <div className="action-buttons-group">
+                    <button
+                      type="button"
+                      className="btn-action btn-download"
+                      onClick={handleDownloadToGallery}
+                      title="Download gambar hasil rancangan ke galeri HP / Laptop"
+                    >
+                      📸 Simpan ke Galeri HP
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-action btn-save-order"
+                      onClick={handleSaveConfiguration}
+                      disabled={isLoading || !costBreakdown || isSaving}
+                      title="Simpan desain mebel ke riwayat pesanan"
+                    >
+                      {isSaving ? 'Menyimpan...' : '💾 Simpan Desain & Lanjut Pesan'}
+                    </button>
+                  </div>
                 </div>
               </div>
             )}

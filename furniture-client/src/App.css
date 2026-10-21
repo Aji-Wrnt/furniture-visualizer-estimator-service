@@ -690,3 +690,93 @@ hr {
   width: 36px;
   height: 36px;
 }
+
+/* ========================================================
+   ACTION BUTTONS GROUP (DOWNLOAD GALERI & SIMPAN PESANAN)
+   ======================================================== */
+.action-buttons-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.btn-action {
+  width: 100%;
+  padding: 13px 16px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn-download {
+  background: rgba(16, 185, 129, 0.16);
+  border: 1px solid rgba(52, 211, 153, 0.45);
+  color: #34d399;
+}
+
+.btn-download:hover {
+  background: rgba(16, 185, 129, 0.28);
+  border-color: #34d399;
+  transform: translateY(-1px);
+}
+
+.btn-save-order {
+  background-color: #2563eb;
+  color: white;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+}
+
+.btn-save-order:hover {
+  background-color: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.btn-save-order:disabled,
+.btn-download:disabled {
+  background-color: #334155;
+  border-color: #475569;
+  color: #94a3b8;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Tombol Shutter Ambil Foto Langsung di Layar Kamera AR */
+.btn-ar-shutter {
+  position: absolute;
+  top: 60px;
+  left: 16px;
+  z-index: 10;
+  padding: 8px 14px;
+  background: rgba(16, 185, 129, 0.82);
+  color: #ffffff;
+  border: 1px solid rgba(52, 211, 153, 0.6);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-ar-shutter:hover {
+  background: rgba(16, 185, 129, 0.95);
+  transform: scale(1.03);
+}
+
+.btn-ar-shutter:active {
+  transform: scale(0.96);
+}

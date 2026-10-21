@@ -252,11 +252,25 @@ export const getOrderPayload = async (req, res) => {
     const orderPayload = {
       itemType: 'CUSTOM_FURNITURE',
       configurationId: row.id,
+      title: row.furniture_name || 'Custom Furniture',
       productName: row.furniture_name || 'Custom Furniture',
+      dimensions: {
+        widthCm: Number(row.real_width_cm),
+        heightCm: Number(row.real_height_cm),
+        depthCm: Number(row.real_depth_cm),
+      },
       realDimensions: {
         widthCm: Number(row.real_width_cm),
         heightCm: Number(row.real_height_cm),
         depthCm: Number(row.real_depth_cm),
+      },
+      specifications: {
+        baseMaterial: row.base_material_name || '-',
+        finishing: row.finishing_material_name || '-',
+        shelves: Number(specs.shelvesCount) || 0,
+        door: specs.hasDoor ? (specs.doorType || 'DOUBLE') : 'NONE',
+        finishColorHex: specs.finishColorHex || '#8B5A2B',
+        requiresInstallation: Boolean(specs.withInstallationService),
       },
       specsSummary: {
         wood: row.base_material_name || '-',
@@ -266,7 +280,13 @@ export const getOrderPayload = async (req, res) => {
         finishColorHex: specs.finishColorHex || '#8B5A2B',
         requiresTukangInstallation: Boolean(specs.withInstallationService),
       },
+      previewImageUrl: row.ar_snapshot_url,
       referenceSnapshotUrl: row.ar_snapshot_url,
+      pricing: {
+        materialCost: Number(row.estimated_material_cost),
+        laborCost: Number(row.estimated_labor_cost),
+        totalPrice: Number(row.estimated_total_price),
+      },
       priceBreakdown: {
         materialsCost: Number(row.estimated_material_cost),
         laborCost: Number(row.estimated_labor_cost),
