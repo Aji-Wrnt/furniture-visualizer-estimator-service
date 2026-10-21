@@ -1,0 +1,33 @@
+# ============================================================
+# DOCKERIGNORE: Daftar file/folder yang tidak boleh masuk ke image
+# ============================================================
+
+# Dependencies lokal komputer host
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Frontend client
+furniture-client
+
+# Secrets & Environment variables lokal
+.env
+.env.*
+!.env.example
+
+# Git & Dokumentasi internal
+.git
+.gitignore
+*.md
+
+# Editor & OS files
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# Docker build helpers
+docker
+Dockerfile
+docker-compose*.yml
