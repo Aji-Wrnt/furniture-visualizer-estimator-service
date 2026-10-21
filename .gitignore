@@ -48,3 +48,8 @@ coverage/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Temporary test scripts
+test-*.mjs
+test-*.js
+scratch/

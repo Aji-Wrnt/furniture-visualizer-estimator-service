@@ -483,55 +483,43 @@ hr {
 }
 
 /* ========================================================
-   VIRTUAL ANALOG CONTROLS (SPLIT-THUMB GLASSMORPHISM)
+   AR CONTROLLER (3X3 KEYPAD POJOK KANAN BAWAH)
    ======================================================== */
 .ar-control-overlay {
   position: absolute;
   bottom: 12px;
-  left: 12px;
   right: 12px;
-  display: flex;
-  justify-content: space-between; /* Pisahkan ke pojok kiri dan kanan layar */
-  align-items: flex-end;
   pointer-events: none;
   z-index: 10;
   user-select: none;
   -webkit-user-select: none;
 }
 
-/* Container Kiri & Kanan dibuat semi-transparan dengan blur modern */
-.dpad-container,
-.rotation-controls {
+.keypad-3x3 {
   pointer-events: auto;
   user-select: none;
-  background: rgba(15, 23, 42, 0.42); /* Transparan tinggi agar objek/lantai tetap terlihat */
+  background: rgba(15, 23, 42, 0.45);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   padding: 6px;
   border-radius: 16px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
-}
-
-.dpad-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 3px;
+  gap: 4px;
 }
 
-.dpad-row {
+.keypad-row {
   display: flex;
-  align-items: center;
-  gap: 3px;
+  gap: 4px;
 }
 
-/* Ukuran Tombol 36px ringkas tetapi Hitbox diperluas 6px via ::after */
-.dpad-btn {
-  width: 36px;
-  height: 36px;
+.keypad-btn {
+  width: 38px;
+  height: 38px;
   border-radius: 8px;
-  background: rgba(30, 41, 59, 0.55);
+  background: rgba(30, 41, 59, 0.6);
   color: #f1f5f9;
   border: 1px solid rgba(255, 255, 255, 0.14);
   font-size: 0.95rem;
@@ -545,8 +533,8 @@ hr {
   transition: background 0.15s, transform 0.1s, border-color 0.15s;
 }
 
-/* Trik Hitbox: Menambah area sentuh 6px di sekeliling tombol (efektif 48x48px) agar tidak meleset */
-.dpad-btn::after {
+/* Hitbox diperluas 6px agar sentuhan jempol akurat */
+.keypad-btn::after {
   content: '';
   position: absolute;
   top: -6px;
@@ -555,63 +543,21 @@ hr {
   right: -6px;
 }
 
-.dpad-btn:active {
+.keypad-btn:active {
   background: #38bdf8;
   color: #0f172a;
   border-color: #38bdf8;
   transform: scale(0.92);
 }
 
-.dpad-btn.center-reset {
-  background: rgba(51, 65, 85, 0.6);
+.keypad-btn.center-reset {
+  background: rgba(51, 65, 85, 0.7);
   color: #38bdf8;
-  font-size: 0.85rem;
 }
 
-.dpad-btn.center-reset:active {
+.keypad-btn.center-reset:active {
   background: #38bdf8;
   color: #0f172a;
-}
-
-/* Panel Rotasi Kanan Dibuat Vertikal agar Hemat Ruang & Ergonomis Jempol Kanan */
-.rotation-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.rot-btn {
-  height: 36px;
-  padding: 0 10px;
-  background: rgba(30, 41, 59, 0.55);
-  color: #f1f5f9;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 8px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  touch-action: none;
-  position: relative;
-  transition: all 0.15s ease;
-}
-
-.rot-btn::after {
-  content: '';
-  position: absolute;
-  top: -5px;
-  bottom: -5px;
-  left: -5px;
-  right: -5px;
-}
-
-.rot-btn:active {
-  background: #38bdf8;
-  color: #0f172a;
-  border-color: #38bdf8;
-  transform: scale(0.94);
 }
 
 /* Tombol Toggle Sembunyikan/Tampilkan Kontrol Analog */
@@ -640,55 +586,6 @@ hr {
 .btn-controls-toggle:hover {
   background: rgba(30, 41, 59, 0.85);
   border-color: #38bdf8;
-}
-
-.elevation-badge {
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: #38bdf8;
-  text-align: center;
-  background: rgba(15, 23, 42, 0.7);
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  border-radius: 6px;
-  padding: 2px 6px;
-  white-space: nowrap;
-}
-
-.elevation-row,
-.rot-row {
-  display: flex;
-  gap: 4px;
-}
-
-.elev-btn {
-  font-size: 0.72rem;
-  flex: 1;
-}
-
-.left-controls {
-  display: flex;
-  align-items: flex-end;
-  gap: 8px;
-  pointer-events: auto;
-}
-
-.elevation-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  background: rgba(15, 23, 42, 0.42);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 6px;
-  border-radius: 14px;
-}
-
-.elevation-buttons .elev-btn {
-  font-size: 11px;
-  font-weight: 700;
-  width: 36px;
-  height: 36px;
 }
 
 /* ========================================================

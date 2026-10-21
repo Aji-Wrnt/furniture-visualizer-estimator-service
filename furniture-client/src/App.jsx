@@ -268,21 +268,21 @@ export default function App() {
             className={`nav-btn ${currentView === 'storefront' ? 'active' : ''}`}
             onClick={() => setCurrentView('storefront')}
           >
-            🪑 Etalase
+            Etalase
           </button>
           <button
             type="button"
             className={`nav-btn ${currentView === 'studio' ? 'active' : ''}`}
             onClick={() => setCurrentView('studio')}
           >
-            📐 Studio 3D
+            Studio 3D
           </button>
           <button
             type="button"
             className={`nav-btn ${currentView === 'orders' ? 'active' : ''}`}
             onClick={() => setCurrentView('orders')}
           >
-            📋 Pesanan Saya
+            Pesanan Saya
           </button>
         </nav>
       </header>
@@ -329,7 +329,7 @@ export default function App() {
 
                 {/* Kontrol UI Panel */}
                 <div className="control-panel">
-                  <h2>Studio 3D: {selectedProduct?.name || 'Custom Mebel'}</h2>
+                  <h2>{selectedProduct?.name || 'Custom Mebel'}</h2>
 
                   <div className="form-group">
                     <label>Ganti Model Mebel:</label>
@@ -464,8 +464,7 @@ export default function App() {
                       onChange={(e) => setWithInstallation(e.target.checked)}
                     />
                     <div className="checkbox-text">
-                      <strong>Tambah Jasa Instalasi & Pemasangan (+Tukang)</strong>
-                      <p>Tukang kayu ayah akan datang langsung merakit dan mengunci lemari ke dinding ruangan Anda.</p>
+                      <strong>Tambah Jasa Instalasi & Pemasangan (+ Tukang)</strong>
                     </div>
                   </label>
 
@@ -521,7 +520,7 @@ export default function App() {
                       onClick={handleDownloadToGallery}
                       title="Download gambar hasil rancangan ke galeri HP / Laptop"
                     >
-                      📸 Simpan ke Galeri HP
+                      Simpan ke Galeri
                     </button>
                     <button
                       type="button"
@@ -530,7 +529,7 @@ export default function App() {
                       disabled={isLoading || !costBreakdown || isSaving}
                       title="Simpan desain mebel ke riwayat pesanan"
                     >
-                      {isSaving ? 'Menyimpan...' : '💾 Simpan Desain & Lanjut Pesan'}
+                      {isSaving ? 'Menyimpan...' : 'Simpan Desain'}
                     </button>
                   </div>
                 </div>
@@ -555,7 +554,6 @@ export default function App() {
           className={`nav-item ${currentView === 'storefront' ? 'active' : ''}`}
           onClick={() => setCurrentView('storefront')}
         >
-          <span className="icon">🪑</span>
           <span>Etalase</span>
         </button>
         <button
@@ -563,7 +561,6 @@ export default function App() {
           className={`nav-item ${currentView === 'studio' ? 'active' : ''}`}
           onClick={() => setCurrentView('studio')}
         >
-          <span className="icon">📐</span>
           <span>Studio 3D</span>
         </button>
         <button
@@ -571,7 +568,6 @@ export default function App() {
           className={`nav-item ${currentView === 'orders' ? 'active' : ''}`}
           onClick={() => setCurrentView('orders')}
         >
-          <span className="icon">📋</span>
           <span>Pesanan</span>
         </button>
       </nav>

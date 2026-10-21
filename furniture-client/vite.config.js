@@ -10,10 +10,15 @@ export default defineConfig({
     allowedHosts: true, // Izinkan domain tunneling eksternal seperti localtunnel (*.loca.lt) / ngrok
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'http://127.0.0.1:5000',
         changeOrigin: true,
         secure: false,
       },
     },
+  },
+  preview: {
+    host: true,
+    port: 5173,
+    allowedHosts: true,
   },
 });

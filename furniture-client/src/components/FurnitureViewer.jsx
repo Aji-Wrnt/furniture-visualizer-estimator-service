@@ -32,10 +32,24 @@ const FurnitureViewer = forwardRef(function FurnitureViewer(
     const canvas3D = rendererRef.current.domElement;
     const video = videoRef.current;
 
-    // 2. Buat canvas pembantu seukuran resolusi kanvas Three.js
+    // 2. Buat canvas pembantu dengan resolusi optimal (maks 1280px agar transfer data instan & anti-timeout)
+    const maxDim = 1280;
+    let targetWidth = canvas3D.width || 800;
+    let targetHeight = canvas3D.height || 600;
+
+    if (targetWidth > maxDim || targetHeight > maxDim) {
+      if (targetWidth > targetHeight) {
+        targetHeight = Math.round((targetHeight * maxDim) / targetWidth);
+        targetWidth = maxDim;
+      } else {
+        targetWidth = Math.round((targetWidth * maxDim) / targetHeight);
+        targetHeight = maxDim;
+      }
+    }
+
     const offscreenCanvas = document.createElement('canvas');
-    offscreenCanvas.width = canvas3D.width;
-    offscreenCanvas.height = canvas3D.height;
+    offscreenCanvas.width = targetWidth;
+    offscreenCanvas.height = targetHeight;
     const ctx = offscreenCanvas.getContext('2d');
 
     // 3. Layer 1: Frame Kamera Ruangan (jika mode AR aktif dan feed video siap)
@@ -64,10 +78,10 @@ const FurnitureViewer = forwardRef(function FurnitureViewer(
     }
 
     // 4. Layer 2: Objek 3D Lemari
-    ctx.drawImage(canvas3D, 0, 0);
+    ctx.drawImage(canvas3D, 0, 0, offscreenCanvas.width, offscreenCanvas.height);
 
-    // 5. Ekspor ke Base64 PNG
-    return offscreenCanvas.toDataURL('image/png');
+    // 5. Ekspor ke Base64 JPEG (kualitas 85% untuk foto ruangan, ukuran file super ringan ~200KB)
+    return offscreenCanvas.toDataURL('image/jpeg', 0.85);
   };
 
   // Fungsi unduh gambar langsung ke memori / galeri perangkat
@@ -80,7 +94,7 @@ const FurnitureViewer = forwardRef(function FurnitureViewer(
 
     const downloadLink = document.createElement('a');
     downloadLink.href = dataUrl;
-    downloadLink.download = `${prefix}-${Date.now()}.png`;
+    downloadLink.download = `${prefix}-${Date.now()}.jpg`;
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
@@ -566,7 +580,7 @@ const FurnitureViewer = forwardRef(function FurnitureViewer(
         onClick={toggleARMode}
         className="btn-ar-toggle"
       >
-        <span>{arMode ? '⏹️ Matikan Kamera (Mode 3D)' : '📷 Aktifkan Kamera Ruangan (AR)'}</span>
+        <span>{arMode ? 'Matikan Kamera (Mode 3D)' : 'Aktifkan Kamera (AR)'}</span>
       </button>
 
       {/* Tombol Toggle Kontrol saat Mode AR Aktif */}
@@ -577,7 +591,7 @@ const FurnitureViewer = forwardRef(function FurnitureViewer(
           className="btn-controls-toggle"
           title="Sembunyikan atau Tampilkan Kontrol Analog"
         >
-          {showControls ? '🎮 Sembunyikan Kontrol' : '🎮 Tampilkan Kontrol'}
+          {showControls ? 'Sembunyikan Kontrol' : 'Tampilkan Kontrol'}
         </button>
       )}
 
@@ -589,129 +603,126 @@ const FurnitureViewer = forwardRef(function FurnitureViewer(
           className="btn-ar-shutter"
           title="Ambil Foto Ruangan + 3D dan Unduh ke Galeri HP"
         >
-          <span>📸 Ambil Foto</span>
+          <span>Ambil Foto</span>
         </button>
       )}
 
-      {/* Kontrol Analog Virtual Split-Thumb saat Mode AR Aktif */}
+      {/* Kontrol Pad 3x3 Pojok Kanan Bawah saat Mode AR Aktif */}
       {arMode && showControls && (
         <div className="ar-control-overlay">
-          {/* Sisi Kiri: D-Pad Translasi & Tombol Elevasi Manual */}
-          <div className="left-controls">
-            {/* Tombol Manual Elevasi Sumbu Y (Naik ke Meja / Turun ke Lantai) */}
-            <div className="elevation-buttons">
+          <div className="keypad-3x3">
+            {/* Baris 1: Putar Kiri | Naik (+Y) | Putar Kanan */}
+            <div className="keypad-row">
               <button
                 type="button"
-                className="dpad-btn elev-btn"
-                title="Naikkan ke Meja (Sumbu +Y)"
-                onMouseDown={() => startMoving('y', 0.04)}
+                className="keypad-btn"
+                title="Putar Kiri"
+                onMouseDown={() => startMoving('rotateY', -0.08)}
                 onMouseUp={stopMoving}
-                onTouchStart={() => startMoving('y', 0.04)}
+                onTouchStart={() => startMoving('rotateY', -0.08)}
                 onTouchEnd={stopMoving}
               >
-                ▲ Y
+                ↺
               </button>
               <button
                 type="button"
-                className="dpad-btn elev-btn"
-                title="Turunkan ke Lantai (Sumbu -Y)"
-                onMouseDown={() => startMoving('y', -0.04)}
+                className="keypad-btn"
+                title="Naikkan (+Y)"
+                onMouseDown={() => startMoving('y', 0.03)}
                 onMouseUp={stopMoving}
-                onTouchStart={() => startMoving('y', -0.04)}
+                onTouchStart={() => startMoving('y', 0.03)}
                 onTouchEnd={stopMoving}
               >
-                ▼ Y
+                ▲
+              </button>
+              <button
+                type="button"
+                className="keypad-btn"
+                title="Putar Kanan"
+                onMouseDown={() => startMoving('rotateY', 0.08)}
+                onMouseUp={stopMoving}
+                onTouchStart={() => startMoving('rotateY', 0.08)}
+                onTouchEnd={stopMoving}
+              >
+                ↻
               </button>
             </div>
 
-            {/* D-Pad Maju, Mundur, Kiri, Kanan */}
-            <div className="dpad-container">
+            {/* Baris 2: Geser Kiri (-X) | Reset Posisi & Rotasi | Geser Kanan (+X) */}
+            <div className="keypad-row">
               <button
                 type="button"
-                className="dpad-btn up"
-                title="Maju (Mendekat ke Dinding)"
+                className="keypad-btn"
+                title="Geser Kiri (-X)"
+                onMouseDown={() => startMoving('x', -0.05)}
+                onMouseUp={stopMoving}
+                onTouchStart={() => startMoving('x', -0.05)}
+                onTouchEnd={stopMoving}
+              >
+                ◀
+              </button>
+              <button
+                type="button"
+                className="keypad-btn center-reset"
+                title="Reset Posisi & Rotasi"
+                onClick={() => {
+                  if (furnitureGroupRef.current) {
+                    furnitureGroupRef.current.position.set(0, 0, 0);
+                    furnitureGroupRef.current.rotation.set(0, 0, 0);
+                  }
+                }}
+              >
+                ◉
+              </button>
+              <button
+                type="button"
+                className="keypad-btn"
+                title="Geser Kanan (+X)"
+                onMouseDown={() => startMoving('x', 0.05)}
+                onMouseUp={stopMoving}
+                onTouchStart={() => startMoving('x', 0.05)}
+                onTouchEnd={stopMoving}
+              >
+                ▶
+              </button>
+            </div>
+
+            {/* Baris 3: Jauhkan/Mundur (-Z) | Turunkan (-Y) | Dekatkan/Maju (+Z) */}
+            <div className="keypad-row">
+              <button
+                type="button"
+                className="keypad-btn"
+                title="Jauhkan / Mundur (-Z)"
                 onMouseDown={() => startMoving('z', -0.05)}
                 onMouseUp={stopMoving}
                 onTouchStart={() => startMoving('z', -0.05)}
                 onTouchEnd={stopMoving}
               >
-                ▲
+                -
               </button>
-              <div className="dpad-row">
-                <button
-                  type="button"
-                  className="dpad-btn left"
-                  title="Geser Kiri"
-                  onMouseDown={() => startMoving('x', -0.05)}
-                  onMouseUp={stopMoving}
-                  onTouchStart={() => startMoving('x', -0.05)}
-                  onTouchEnd={stopMoving}
-                >
-                  ◀
-                </button>
-                <button
-                  type="button"
-                  className="dpad-btn center-reset"
-                  title="Reset Posisi & Rotasi"
-                  onClick={() => {
-                    if (furnitureGroupRef.current) {
-                      furnitureGroupRef.current.position.set(0, 0, 0);
-                      furnitureGroupRef.current.rotation.set(0, 0, 0);
-                    }
-                  }}
-                >
-                  ◉
-                </button>
-                <button
-                  type="button"
-                  className="dpad-btn right"
-                  title="Geser Kanan"
-                  onMouseDown={() => startMoving('x', 0.05)}
-                  onMouseUp={stopMoving}
-                  onTouchStart={() => startMoving('x', 0.05)}
-                  onTouchEnd={stopMoving}
-                >
-                  ▶
-                </button>
-              </div>
               <button
                 type="button"
-                className="dpad-btn down"
-                title="Mundur (Mendekat ke Layar)"
+                className="keypad-btn"
+                title="Turunkan (-Y)"
+                onMouseDown={() => startMoving('y', -0.03)}
+                onMouseUp={stopMoving}
+                onTouchStart={() => startMoving('y', -0.03)}
+                onTouchEnd={stopMoving}
+              >
+                ▼
+              </button>
+              <button
+                type="button"
+                className="keypad-btn"
+                title="Dekatkan / Maju (+Z)"
                 onMouseDown={() => startMoving('z', 0.05)}
                 onMouseUp={stopMoving}
                 onTouchStart={() => startMoving('z', 0.05)}
                 onTouchEnd={stopMoving}
               >
-                ▼
+                +
               </button>
             </div>
-          </div>
-
-          {/* Sisi Kanan: Rotasi Manual */}
-          <div className="rotation-controls">
-            <button
-              type="button"
-              className="rot-btn"
-              title="Putar Kiri"
-              onMouseDown={() => startMoving('rotateY', -0.08)}
-              onMouseUp={stopMoving}
-              onTouchStart={() => startMoving('rotateY', -0.08)}
-              onTouchEnd={stopMoving}
-            >
-              ↺ Putar Kiri
-            </button>
-            <button
-              type="button"
-              className="rot-btn"
-              title="Putar Kanan"
-              onMouseDown={() => startMoving('rotateY', 0.08)}
-              onMouseUp={stopMoving}
-              onTouchStart={() => startMoving('rotateY', 0.08)}
-              onTouchEnd={stopMoving}
-            >
-              Putar Kanan ↻
-            </button>
           </div>
         </div>
       )}

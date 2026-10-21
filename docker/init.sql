@@ -50,9 +50,9 @@ CREATE TABLE IF NOT EXISTS custom_configurations (
 INSERT INTO catalog_furniture (
   id, name, category, model_3d_url, min_width_cm, max_width_cm, min_height_cm, max_height_cm, min_depth_cm, max_depth_cm, base_labor_cost
 ) VALUES 
-  ('35b964ee-4b73-45b6-b3dd-ef1e3943d7e4', 'Lemari Pakaian Minimalis Modern', 'LEMARI', 'https://assets.tukangonline.com/3d/wardrobe_base.glb', 60, 240, 120, 260, 45, 70, 450000.00),
-  ('6be48fca-7416-4ac4-a7c8-f7359607d091', 'Rak Buku / Display Sekat Modular', 'RAK_BUKU', 'https://assets.tukangonline.com/3d/bookshelf_base.glb', 40, 200, 80, 240, 30, 50, 300000.00),
-  ('b59ae5c7-6c71-4729-8ba3-cc422245125f', 'Credenza TV / Meja Konsol Rendah', 'MEJA', NULL, 120, 220, 45, 80, 40, 50, 300000.00)
+  ('35b964ee-4b73-45b6-b3dd-ef1e3943d7e4', 'Lemari Pakaian Minimalis', 'LEMARI', 'https://assets.tukangonline.com/3d/wardrobe_base.glb', 60, 240, 120, 260, 45, 70, 450000.00),
+  ('6be48fca-7416-4ac4-a7c8-f7359607d091', 'Rak Buku Modular', 'RAK_BUKU', 'https://assets.tukangonline.com/3d/bookshelf_base.glb', 40, 200, 80, 240, 30, 50, 300000.00),
+  ('b59ae5c7-6c71-4729-8ba3-cc422245125f', 'Credenza TV', 'MEJA', NULL, 120, 220, 45, 80, 40, 50, 300000.00)
 ON CONFLICT (id) DO NOTHING;
 
 -- Seed Data Master Material

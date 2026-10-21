@@ -48,22 +48,28 @@ export default function Dashboard({ onSelectConfig, onBack }) {
         </div>
       ) : errorMsg ? (
         <div style={styles.centerBox}>
-          <p style={{ color: '#ef4444' }}>⚠️ {errorMsg}</p>
+          <p style={{ color: '#ef4444' }}>{errorMsg}</p>
           <button onClick={onBack} style={styles.btnBack}>
             Kembali ke 3D
           </button>
         </div>
       ) : configs.length === 0 ? (
         <div style={styles.centerBox}>
-          <div style={{ fontSize: '3rem', marginBottom: '12px' }}>📦</div>
+          <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+              <line x1="12" y1="22.08" x2="12" y2="12" />
+            </svg>
+          </div>
           <p style={{ color: '#cbd5e1', fontSize: '1.1rem', marginBottom: '8px' }}>
             Belum ada konfigurasi mebel yang tersimpan.
           </p>
           <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '16px' }}>
-            Sesuaikan ukuran dan bahan di Studio 3D, lalu klik "Simpan Konfigurasi Custom".
+            Sesuaikan ukuran dan bahan di Studio 3D, lalu klik "Simpan Desain".
           </p>
           <button onClick={onBack} style={styles.btnLoad}>
-            + Buka Studio 3D Sekarang
+            Buka Studio 3D
           </button>
         </div>
       ) : (
@@ -101,8 +107,7 @@ export default function Dashboard({ onSelectConfig, onBack }) {
                     />
                   ) : (
                     <div style={styles.noImg}>
-                      <span>📐</span>
-                      <span>Tidak Ada Foto Snapshot</span>
+                      <span style={{ fontSize: '0.85rem', color: '#64748b' }}>Tidak Ada Foto Snapshot</span>
                     </div>
                   )}
                   {createdDate && (
@@ -164,7 +169,7 @@ export default function Dashboard({ onSelectConfig, onBack }) {
                     style={styles.btnLoad}
                     onClick={() => onSelectConfig(item)}
                   >
-                    Buka di Studio 3D ➔
+                    Buka di Studio 3D
                   </button>
                 </div>
               </div>
